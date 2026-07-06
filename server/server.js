@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const foodRoutes = require("./routes/foodRoutes");
+const requestRoutes = require("./routes/requestRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +18,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/foods", foodRoutes);
+app.use("/api/requests", requestRoutes);
 
 const PORT = process.env.PORT || 5000;
 
