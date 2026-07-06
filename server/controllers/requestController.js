@@ -57,7 +57,6 @@ const getAllRequests = async (req, res) => {
 const acceptRequest = async (req, res) => {
     try {
 
-        // Find the request
         const request = await Request.findById(req.params.id);
 
         if (!request) {
@@ -96,10 +95,43 @@ const acceptRequest = async (req, res) => {
 };
 
 // ===============================
+// Reject Food Request
+// ===============================
+const rejectRequest = async (req, res) => {
+    try {
+
+        const request = await Request.findById(req.params.id);
+
+        if (!request) {
+            return res.status(404).json({
+                message: "Request not found"
+            });
+        }
+
+        // Update request status
+        request.status = "Rejected";
+        await request.save();
+
+        res.status(200).json({
+            message: "Request rejected successfully",
+            request
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
+// ===============================
 // Export Functions
 // ===============================
 module.exports = {
     createRequest,
     getAllRequests,
-    acceptRequest
+    acceptRequest,
+    rejectRequest
 };

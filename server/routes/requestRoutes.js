@@ -8,7 +8,8 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 const {
     createRequest,
     getAllRequests,
-    acceptRequest
+    acceptRequest,
+    rejectRequest
 } = require("../controllers/requestController");
 
 // View all requests
@@ -28,6 +29,14 @@ router.put(
     authMiddleware,
     roleMiddleware("Donor"),
     acceptRequest
+);
+
+// Donor rejects a request
+router.put(
+    "/:id/reject",
+    authMiddleware,
+    roleMiddleware("Donor"),
+    rejectRequest
 );
 
 module.exports = router;
