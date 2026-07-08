@@ -8,14 +8,44 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 const {
     createRequest,
     getAllRequests,
+    getMyRequests,
+    getDonorRequests,
     acceptRequest,
     rejectRequest
 } = require("../controllers/requestController");
 
-// View all requests
-router.get("/", getAllRequests);
+// ======================================
+// Get All Requests (Testing)
+// ======================================
+router.get(
+    "/",
+    authMiddleware,
+    getAllRequests
+);
 
-// NGO creates a request
+// ======================================
+// NGO - View My Requests
+// ======================================
+router.get(
+    "/my",
+    authMiddleware,
+    roleMiddleware("NGO"),
+    getMyRequests
+);
+
+// ======================================
+// Donor - View Requests For My Food
+// ======================================
+router.get(
+    "/donor",
+    authMiddleware,
+    roleMiddleware("Donor"),
+    getDonorRequests
+);
+
+// ======================================
+// NGO - Create Food Request
+// ======================================
 router.post(
     "/",
     authMiddleware,
@@ -23,7 +53,9 @@ router.post(
     createRequest
 );
 
-// Donor accepts a request
+// ======================================
+// Donor - Accept Request
+// ======================================
 router.put(
     "/:id/accept",
     authMiddleware,
@@ -31,7 +63,9 @@ router.put(
     acceptRequest
 );
 
-// Donor rejects a request
+// ======================================
+// Donor - Reject Request
+// ======================================
 router.put(
     "/:id/reject",
     authMiddleware,

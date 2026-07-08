@@ -7,16 +7,34 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
     addFood,
-    getAllFood,
+    getAllFoods,
     getFoodById,
     updateFood,
     deleteFood
 } = require("../controllers/foodController");
 
-// Public Routes
-router.get("/", getAllFood);
-router.get("/:id", getFoodById);
+// ===============================
+// Get All Foods
+// Accessible by both Donor and NGO
+// ===============================
+router.get(
+    "/",
+    authMiddleware,
+    getAllFoods
+);
 
+// ===============================
+// Get Food By ID
+// ===============================
+router.get(
+    "/:id",
+    authMiddleware,
+    getFoodById
+);
+
+// ===============================
+// Add Food (Donor Only)
+// ===============================
 router.post(
     "/",
     authMiddleware,
@@ -24,6 +42,9 @@ router.post(
     addFood
 );
 
+// ===============================
+// Update Food (Donor Only)
+// ===============================
 router.put(
     "/:id",
     authMiddleware,
@@ -31,6 +52,9 @@ router.put(
     updateFood
 );
 
+// ===============================
+// Delete Food (Donor Only)
+// ===============================
 router.delete(
     "/:id",
     authMiddleware,

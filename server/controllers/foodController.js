@@ -1,7 +1,7 @@
 const Food = require("../models/Food");
 
 // ===============================
-// Add Food Donation
+// Add Food
 // ===============================
 const addFood = async (req, res) => {
     try {
@@ -40,12 +40,32 @@ const addFood = async (req, res) => {
 };
 
 // ===============================
-// Get All Food Donations
+// Get All Foods
 // ===============================
-const getAllFood = async (req, res) => {
+const getAllFoods = async (req, res) => {
+
     try {
 
-        const foods = await Food.find().populate("donor", "name email");
+        let foods = [];
+
+        // Donor → Only his available foods
+        if (req.user.role === "Donor") {
+
+            foods = await Food.find({
+                donor: req.user.id,
+                status: "Available"
+            });
+
+        }
+
+        // NGO → Only available foods
+        else if (req.user.role === "NGO") {
+
+            foods = await Food.find({
+                status: "Available"
+            }).populate("donor", "name email");
+
+        }
 
         res.status(200).json(foods);
 
@@ -56,16 +76,17 @@ const getAllFood = async (req, res) => {
         });
 
     }
+
 };
 
 // ===============================
-// Get Single Food Donation
+// Get Food By ID
 // ===============================
 const getFoodById = async (req, res) => {
+
     try {
 
-        const food = await Food.findById(req.params.id)
-            .populate("donor", "name email");
+        const food = await Food.findById(req.params.id);
 
         if (!food) {
             return res.status(404).json({
@@ -82,28 +103,37 @@ const getFoodById = async (req, res) => {
         });
 
     }
+
 };
 
 // ===============================
-// Update Food Donation
+// Update Food
 // ===============================
 const updateFood = async (req, res) => {
+
     try {
+
+        const food = await Food.findById(req.params.id);
+
+        if (!food) {
+            return res.status(404).json({
+                message: "Food not found"
+            });
+        }
+
+        if (food.donor.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Access denied"
+            });
+        }
 
         const updatedFood = await Food.findByIdAndUpdate(
             req.params.id,
             req.body,
             {
-                new: true,
-                runValidators: true
+                new: true
             }
         );
-
-        if (!updatedFood) {
-            return res.status(404).json({
-                message: "Food not found"
-            });
-        }
 
         res.status(200).json({
             message: "Food updated successfully",
@@ -117,21 +147,31 @@ const updateFood = async (req, res) => {
         });
 
     }
+
 };
 
 // ===============================
-// Delete Food Donation
+// Delete Food
 // ===============================
 const deleteFood = async (req, res) => {
+
     try {
 
-        const deletedFood = await Food.findByIdAndDelete(req.params.id);
+        const food = await Food.findById(req.params.id);
 
-        if (!deletedFood) {
+        if (!food) {
             return res.status(404).json({
                 message: "Food not found"
             });
         }
+
+        if (food.donor.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Access denied"
+            });
+        }
+
+        await Food.findByIdAndDelete(req.params.id);
 
         res.status(200).json({
             message: "Food deleted successfully"
@@ -144,11 +184,12 @@ const deleteFood = async (req, res) => {
         });
 
     }
+
 };
 
 module.exports = {
     addFood,
-    getAllFood,
+    getAllFoods,
     getFoodById,
     updateFood,
     deleteFood
