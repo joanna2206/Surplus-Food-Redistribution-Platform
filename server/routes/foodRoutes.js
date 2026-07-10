@@ -4,6 +4,7 @@ const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 
 const {
     addFood,
@@ -15,7 +16,6 @@ const {
 
 // ===============================
 // Get All Foods
-// Accessible by both Donor and NGO
 // ===============================
 router.get(
     "/",
@@ -39,7 +39,7 @@ router.post(
     "/",
     authMiddleware,
     roleMiddleware("Donor"),
-    addFood
+     addFood
 );
 
 // ===============================
@@ -49,6 +49,7 @@ router.put(
     "/:id",
     authMiddleware,
     roleMiddleware("Donor"),
+   
     updateFood
 );
 

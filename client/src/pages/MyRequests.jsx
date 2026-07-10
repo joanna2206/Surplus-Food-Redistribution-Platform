@@ -1,12 +1,49 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Navbar from "../components/Navbar";
+import socket from "../socket";
 
 function MyRequests() {
 
     const [requests, setRequests] = useState([]);
 
-    const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"));
+
+useEffect(() => {
+
+    fetchRequests();
+
+}, []);
+
+// ===============================
+// Socket Notifications
+// ===============================
+useEffect(() => {
+
+    socket.on("requestAccepted", (data) => {
+
+        alert("✅ " + data.message);
+
+        fetchRequests();
+
+    });
+
+    socket.on("requestRejected", (data) => {
+
+        alert("❌ " + data.message);
+
+        fetchRequests();
+
+    });
+
+    return () => {
+
+        socket.off("requestAccepted");
+        socket.off("requestRejected");
+
+    };
+
+}, []);
 
     useEffect(() => {
         fetchRequests();
@@ -72,32 +109,31 @@ function MyRequests() {
 
     const rejectRequest = async (id) => {
 
-        try {
+    try {
 
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-            await api.put(
-                `/requests/${id}/reject`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+        await api.put(
+            `/requests/${id}/reject`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            );
+            }
+        );
 
-            alert(error.response?.data?.message || "Reject Failed");
+        alert("Request Rejected Successfully");
 
-            fetchRequests();
+        fetchRequests();
 
-        } catch (error) {
+    } catch (error) {
 
-            alert(error.response?.data?.message || "Reject Failed");
+        alert(error.response?.data?.message || "Reject Failed");
 
-        }
+    }
 
-    };
-
+};
     const styles = {
 
         page:{

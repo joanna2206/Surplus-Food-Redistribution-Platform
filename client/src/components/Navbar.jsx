@@ -1,11 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/navbar.css";
+import { useEffect } from "react";
+import socket from "../socket";
 
 function Navbar() {
 
     const navigate = useNavigate();
 
     const user = JSON.parse(localStorage.getItem("user"));
+    useEffect(() => {
+
+    if (user) {
+
+        socket.connect();
+
+        socket.emit("join", {
+
+            userId: user._id,
+
+            role: user.role
+
+        });
+
+    }
+
+    return () => {
+
+        socket.disconnect();
+
+    };
+
+}, []);
 
     const logout = () => {
 

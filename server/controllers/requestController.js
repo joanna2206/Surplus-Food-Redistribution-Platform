@@ -1,5 +1,6 @@
 const Request = require("../models/Request");
 const Food = require("../models/Food");
+const { getIO } = require("../socket");
 
 // ===============================
 // Create Food Request (NGO)
@@ -39,6 +40,17 @@ const createRequest = async (req, res) => {
             food,
             ngo: req.user.id
         });
+
+        // ===============================
+// Socket Notification to Donor
+// ===============================
+getIO().to(foodItem.donor.toString()).emit("newRequest", {
+
+    message: `New request received for ${foodItem.foodName}`,
+
+    foodName: foodItem.foodName
+
+});
 
         res.status(201).json({
             message: "Food request sent successfully",
@@ -168,21 +180,30 @@ const acceptRequest = async (req, res) => {
         );
 
         // Reject all other pending requests
-        await Request.updateMany(
-            {
-                food: request.food,
-                _id: { $ne: request._id },
-                status: "Pending"
-            },
-            {
-                status: "Rejected"
-            }
-        );
+       await Request.updateMany(
+    {
+        food: request.food,
+        _id: { $ne: request._id },
+        status: "Pending"
+    },
+    {
+        status: "Rejected"
+    }
+);
 
-        res.status(200).json({
-            message: "Request accepted successfully",
-            request
-        });
+// ===============================
+// Socket Notification to NGO
+// ===============================
+getIO().to(request.ngo.toString()).emit("requestAccepted", {
+
+    message: "Your food request has been accepted."
+
+});
+
+res.status(200).json({
+    message: "Request accepted successfully",
+    request
+});
 
     } catch (error) {
 
@@ -212,19 +233,30 @@ const rejectRequest = async (req, res) => {
         request.status = "Rejected";
 
         await request.save();
+// ===============================
+// Socket Notification to NGO
+// ===============================
+getIO().to(request.ngo.toString()).emit("requestRejected", {
 
+   message: "Your food request has been rejected."
+
+});
         res.status(200).json({
             message: "Request rejected successfully",
             request
         });
 
-    } catch (error) {
+    }  catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+    console.error("Reject Error:", error);
 
-    }
+    res.status(500).json({
+        message: error.message
+    });
+
+}
+
+
 
 };
 

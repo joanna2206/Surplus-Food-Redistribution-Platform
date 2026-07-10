@@ -338,9 +338,23 @@ function FoodList() {
 
                                     <div style={styles.top}>
 
-                                        <h2 style={styles.title}>
-                                            {food.foodName}
-                                        </h2>
+{food.image && (
+
+    <img
+        src={food.image}
+        alt={food.foodName}
+        style={{
+            width: "100%",
+            height: "220px",
+            objectFit: "cover",
+            borderRadius: "12px",
+            marginBottom: "15px"
+        }}
+    />
+
+)}
+
+<h2>{food.foodName}</h2>
 
                                         <span
                                             style={

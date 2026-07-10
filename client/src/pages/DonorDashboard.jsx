@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import socket from "../socket";
 import "../styles/dashboard.css";
 
 function DonorDashboard() {
@@ -8,9 +10,29 @@ function DonorDashboard() {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
+    // ===============================
+    // Socket Notification
+    // ===============================
+    useEffect(() => {
+
+        socket.on("newRequest", (data) => {
+
+            alert("🔔 " + data.message);
+
+        });
+
+        return () => {
+
+            socket.off("newRequest");
+
+        };
+
+    }, []);
+
     return (
 
         <>
+
             <Navbar />
 
             <div className="dashboard">

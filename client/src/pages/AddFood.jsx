@@ -12,43 +12,56 @@ function AddFood() {
     const [category, setCategory] = useState("");
     const [expiryDate, setExpiryDate] = useState("");
     const [pickupAddress, setPickupAddress] = useState("");
+    
 
     const handleSubmit = async (e) => {
 
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
+    try {
 
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-            await api.post(
-                "/foods",
-                {
-                    foodName,
-                    quantity,
-                    category,
-                    expiryDate,
-                    pickupAddress
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+       
 
-            alert("Food Added Successfully");
+        await api.post(
 
-            navigate("/donor-dashboard");
+    "/foods",
 
-        } catch (error) {
+    {
 
-            alert(error.response?.data?.message || "Failed to add food");
+        foodName,
+        quantity,
+        category,
+        expiryDate,
+        pickupAddress
+
+    },
+
+    {
+
+        headers: {
+
+            Authorization: `Bearer ${token}`
 
         }
 
-    };
+    }
 
+);
+       
+
+        alert("Food Added Successfully");
+
+        navigate("/donor-dashboard");
+
+    } catch (error) {
+
+        alert(error.response?.data?.message || "Failed to add food");
+
+    }
+
+};
     const styles = {
 
         page:{
@@ -258,6 +271,7 @@ function AddFood() {
                         style={styles.input}
                         required
                     />
+
 
                     <label style={styles.label}>
                         Pickup Address
